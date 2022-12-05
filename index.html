@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Certificate Maker</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: #393939;
+        }
+        .crt-certificate-area {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 300px;
+            background: #cfdfe4;
+            overflow: scroll;
+            display: flex;
+        }
+
+        .crt-control-area {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: #ffffff;
+            width: 300px;
+            height: 100vh;
+            overflow-y: scroll;
+        }
+
+        .crt-control-group {
+            border: solid 1px #adbbc3;
+            display: block;
+            margin-bottom: 15px;
+            background: #f4f4f4;
+        }
+
+        .crt-control-heading {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 999;
+            padding: 5px 15px;
+            box-shadow: 0 0 5px #d0d0d0;
+        }
+        .crt-control-heading h3 {
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            letter-spacing: 5px;
+            color: #5aa7c6;
+        }
+        .crt-control-heading p {
+            font-size: 12px;
+            color: #b2b2b2;
+        }
+
+        .crt-control-group button {
+            width: 100%;
+            outline: none;
+            border: none;
+            padding: 10px;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            background: #cfdee4;
+            color: #5f6d73;
+            position: relative;
+        }
+
+        .crt-control-box {
+            padding: 0 5px;
+        }
+
+        .crt-form-group {
+            margin: 15px 0;
+        }
+
+        .crt-control-body {
+            padding: 0 15px;
+            margin-top: 5px;
+        }
+
+        .crt-form-group label{
+            display: block;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .crt-form-control {
+            width: 100%;
+            padding: 8px 5px;
+            outline: none;
+            border: solid 1px #dbdbdb;
+            color: #393939;
+        }
+        .crt-form-control:focus {
+            border-color: #b9c9ce;
+        }
+
+        input[type="color"].crt-form-control {
+            height: 40px;
+        }
+
+        #certificate-download-button {
+            background: #607d8b;
+            color: #c9c9c9;
+            width: 78px;
+            text-align: center;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        #certificate-download-button:hover {
+            background: #546e7b;
+        }
+
+        .option-arrow {
+            width: 15px;
+            height: 15px;
+            position: absolute;
+            right: 10px;
+            top: 12px;
+        }
+
+        #crt-canvas {
+            box-shadow: 8px 8px 16px #8e9da3;
+        }
+    </style>
+</head>
+<body>
+    <container class="crt-certificate-area">
+        <canvas id="crt-canvas"></canvas>
+    </container>
+
+    <nav class="crt-control-area">
+
+        <div class="crt-control-heading">
+            <h3>Certificate Maker</h3>
+            <p>Powered by <i>chanchal.net</i></p>
+        </div>
+
+        <div class="crt-control-body">
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">General <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-zoom">Zoom (In/Out)</label>
+                        <input type="number" step="0.1" min="0.1" max="1" value="0.8" class="crt-form-control" id="crt-zoom">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="certificate-image-quality">Certificate Image Quality <span id="resolution"></span></label>
+                        <input type="number" step="0.1" min="1" max="100" value="5" class="crt-form-control" id="certificate-image-quality">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="certificate-background-image">Certificate Background Image</label>
+                        <input type="file"  class="crt-form-control" id="certificate-background-image" accept="image/*">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="certificate-download-button">Certificate Download</label>
+                        <button id="certificate-download-button">Download</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Certificate Number <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-number">Number</label>
+                        <input type="text" value="6487421" class="crt-form-control crt-certificate-number" id="crt-certificate-number">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-number-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-number" id="crt-certificate-number-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-number-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-number" id="crt-certificate-number-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-number-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-number" id="crt-certificate-number-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-number-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-number" id="crt-certificate-number-color">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Certificate Title <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-title">Number</label>
+                        <input type="text" value="Certificate Title" class="crt-form-control crt-certificate-title" id="crt-certificate-title">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-title-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-title" id="crt-certificate-title-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-title-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-title" id="crt-certificate-title-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-title-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-title" id="crt-certificate-title-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-title-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-title" id="crt-certificate-title-color">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Certificate Date <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-date">Number</label>
+                        <input type="text" value="10/06/2022" class="crt-form-control crt-certificate-date" id="crt-certificate-date">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-date-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-date" id="crt-certificate-date-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-date-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-date" id="crt-certificate-date-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-date-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-date" id="crt-certificate-date-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-date-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-date" id="crt-certificate-date-color">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Student Name <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-student-name">Name</label>
+                        <input type="text" value="Chanchal Biswas" class="crt-form-control crt-certificate-student-name" id="crt-certificate-student-name">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-student-name-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-student-name" id="crt-certificate-student-name-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-student-name-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-student-name" id="crt-certificate-student-name-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-student-name-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-student-name" id="crt-certificate-student-name-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-student-name-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-student-name" id="crt-certificate-student-name-color">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Body <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body">Description</label>
+                        <textarea class="crt-form-control crt-certificate-body" rows="5" id="crt-certificate-body">In publishing and graphic design, Lorem ipsum is a placeholder text commonly used
+    to demonstrate the visual form of a document or a typeface without relying on meaningful content.
+    Lorem ipsum may be used as a placeholder before final copy is available.
+
+                        </textarea>
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-body" id="crt-certificate-body-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-body" id="crt-certificate-body-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body-line-height">Line Height</label>
+                        <input type="number" value="0" min="1" class="crt-form-control crt-certificate-body" id="crt-certificate-body-line-height">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-body" id="crt-certificate-body-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-body-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-body" id="crt-certificate-body-color">
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Certificate Role 01 <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0">Title</label>
+                        <input type="text" value="Admin" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-color">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-image-position-x">Image Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-image-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-image-position-y">Image Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-image-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-image-quality">Image Quality</label>
+                        <input type="number" step="0.1" min="1" max="100" value="5" class="crt-form-control crt-certificate-role-0" id="crt-certificate-role-0-image-quality">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-0-image">Signature Image</label>
+                        <input type="file"  class="crt-form-control" id="crt-certificate-role-0-image" accept="image/*">
+                    </div>
+                </div>
+            </div>
+
+            <div class="crt-control-group">
+                <button type="button" class="crt-control-btn">Certificate Role 02 <img src="images/arrow.svg" class="option-arrow" alt="arrow" /></button>
+                <div class="crt-control-box">
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1">Title</label>
+                        <input type="text" value="Instructor" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-position-x">Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-position-y">Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-font-size">Font Size</label>
+                        <input type="number" value="30" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-font-size">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-color">Font Color</label>
+                        <input type="color" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-color">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-image-position-x">Image Position X</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-image-position-x">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-image-position-y">Image Position Y</label>
+                        <input type="number" step="0.1" min="-5" max="5" value="0" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-image-position-y">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-image-quality">Image Quality</label>
+                        <input type="number" step="0.1" min="1" max="100" value="5" class="crt-form-control crt-certificate-role-1" id="crt-certificate-role-1-image-quality">
+                    </div>
+
+                    <div class="crt-form-group">
+                        <label for="crt-certificate-role-1-image">Signature Image</label>
+                        <input type="file"  class="crt-form-control" id="crt-certificate-role-1-image" accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <script src="Certificate.js"></script>
+
+    <script>
+
+        const fontFamily = 'Times New Roman';
+
+        /**
+         * Here is an example certificate created and the required properties are specified here.
+         * These properties will be used when creating a 'Certificate' object
+         */
+        const properties = {
+            coverImageUrl: 'images/cover-image.png',
+            zoom: 0.8,
+            certificateImageQuality: 5,
+            certificateX: 0,
+            certificateY: 0,
+            certificateNumber: {
+                text: '3434398',
+                x: 0,
+                y: 0.8,
+                properties: {
+                    font: '38px ' + fontFamily,
+                    fillStyle: '#000000',
+                    textAlign: 'center'
+                }
+            },
+            certificateTitle: {
+                text: 'CERTIFICATE OF COMPLETION',
+                x: 0,
+                y: 1.1,
+                properties: {
+                    font: '72px ' + fontFamily,
+                    fillStyle: '#2d4b31',
+                    textAlign: 'center'
+                }
+            },
+            certificateDate: {
+                text: '15 April 2022',
+                x: 0,
+                y: 1.7,
+                properties: {
+                    font: '38px ' + fontFamily,
+                    fillStyle: '#000000',
+                    textAlign: 'center'
+                }
+            },
+            certificateStudentName: {
+                text: 'Md. Chanchal Biswas',
+                x: 0,
+                y: 1.9,
+                properties: {
+                    font: '48px ' + fontFamily,
+                    fillStyle: '#000000',
+                    textAlign: 'center'
+                }
+            },
+            certificateBody: {
+                text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean condimentum a urna id cursus. enean vitae sem\n" +
+                    "at mi eleifend lacinia eu accumsan turpis. Donec malesuada elit augue, eu aliquet eros ultrices eu.\n" +
+                    "Quisque quis risus nec magna ullamcorper imperdiet ut non mi.",
+                x: 0,
+                y: 2.4,
+                lineHeight: 18,
+                properties: {
+                    font: '36px ' + fontFamily,
+                    fillStyle: '#000000',
+                    textBaseline: 'middle',
+                    textAlign: 'center'
+                }
+            },
+            certificateRoles: [
+                {
+                   signature: {
+                       url: 'images/signature-1.png',
+                       x: 3.58,
+                       y: 3.7,
+                       quality: 1
+                   },
+                    role: {
+                        text: 'Founder and CEO',
+                        x: 2.6,
+                        y: 4.1,
+                        properties: {
+                            font: '32px ' + fontFamily,
+                            fillStyle: '#000000'
+                        }
+                    }
+                },
+                {
+                    signature: {
+                        url: 'images/signature-2.png',
+                        x: 0.92,
+                        y: 3.7,
+                        quality: 1
+                    },
+                    role: {
+                        text: 'Head of Training',
+                        x: -2.6,
+                        y: 4.1,
+                        properties: {
+                            font: '32px ' + fontFamily,
+                            fillStyle: '#000000'
+                        }
+                    }
+                }
+            ],
+        }
+
+        document.querySelectorAll('.crt-control-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (this.nextElementSibling.style.display === '' || this.nextElementSibling.style.display === 'block') {
+                    this.nextElementSibling.style.display = 'none';
+                    this.lastChild.style.transform = 'rotate(180deg)';
+                } else {
+                    this.nextElementSibling.style.display = 'block';
+                    this.lastChild.style.transform = 'rotate(0)';
+                }
+            });
+        });
+
+        const canvas = document.getElementById('crt-canvas');
+        const certificate = new Certificate(canvas);
+
+        certificate.setCoverImage(properties.coverImageUrl);
+        certificate.setRoleImage(properties.certificateRoles[0].signature.url);
+        certificate.setRoleImage(properties.certificateRoles[1].signature.url);
+
+        const render = () => {
+            certificate.clearContext();
+            certificate.setCoverImageProperties(properties.certificateX, properties.certificateY, properties.certificateImageQuality);
+            certificate.setZoom(properties.zoom);
+
+            certificate.setText(properties.certificateNumber);
+            certificate.setText(properties.certificateTitle);
+            certificate.setText(properties.certificateDate);
+            certificate.setText(properties.certificateStudentName);
+            certificate.setText(properties.certificateStudentName);
+            certificate.setTextParagraph(properties.certificateBody);
+            certificate.setRoleImageProperties(properties.certificateRoles[0].signature, 0);
+            certificate.setRoleImageProperties(properties.certificateRoles[1].signature, 1);
+            certificate.setRole(properties.certificateRoles);
+        }
+
+        // For Certificate Action Properties Value Assign
+        const assignElementsValue = (elements, properties, isCertificateBodyElement = false) => {
+            elements[0].value = properties.text;
+            elements[1].value = properties.x;
+            elements[2].value = properties.y;
+
+            if (isCertificateBodyElement === false) {
+                elements[3].value = properties.properties.font.replace('px ' + fontFamily, '');
+                elements[4].value = properties.properties.fillStyle;
+            } else {
+                elements[3].value = properties.lineHeight;
+                elements[4].value = properties.properties.font.replace('px ' + fontFamily, '');
+                elements[5].value = properties.properties.fillStyle;
+            }
+        }
+
+        const resolution = () => {
+            let dimension = certificate.getCoverImageResolution();
+            document.getElementById('resolution').innerText = '(' + dimension.x + ' X ' + dimension.y + ')';
+        }
+
+        // For Zoom (In/Out)
+        document.getElementById('crt-zoom').addEventListener('input', function() {
+            if (parseFloat(this.value) === 1) this.value = '1.0';
+            properties.zoom = this.value;
+            render();
+        });
+
+        // For Certificate Image Quality
+        document.getElementById('certificate-image-quality').addEventListener('input', function() {
+            properties.certificateImageQuality = this.value;
+            render();
+            resolution();
+        });
+
+        // For Certificate Background Image
+        document.getElementById('certificate-background-image').addEventListener('input', function(e) {
+            let reader = new FileReader();
+            reader.readAsDataURL(e.target.files[0]);
+            reader.addEventListener('load', function(e) {
+                certificate.setCoverImage(e.target.result);
+                setTimeout(function() {
+                    render();
+                }, 500);
+            });
+        });
+
+        // For Certificate Number
+        const crtCertificateNumber = document.querySelectorAll('.crt-certificate-number');
+        for (let i = 0; i < crtCertificateNumber.length; i++) {
+            crtCertificateNumber[i].addEventListener('input', function() {
+                properties.certificateNumber.text = crtCertificateNumber[0].value;
+                properties.certificateNumber.x = crtCertificateNumber[1].value;
+                properties.certificateNumber.y = crtCertificateNumber[2].value;
+                properties.certificateNumber.properties.font = crtCertificateNumber[3].value + 'px ' + fontFamily;
+                properties.certificateNumber.properties.fillStyle = crtCertificateNumber[4].value;
+                render();
+            });
+        }
+
+        // For Certificate Title
+        const crtCertificateTitle = document.querySelectorAll('.crt-certificate-title');
+        for (let i = 0; i < crtCertificateTitle.length; i++) {
+            crtCertificateTitle[i].addEventListener('input', function() {
+                properties.certificateTitle.text = crtCertificateTitle[0].value;
+                properties.certificateTitle.x = crtCertificateTitle[1].value;
+                properties.certificateTitle.y = crtCertificateTitle[2].value;
+                properties.certificateTitle.properties.font = crtCertificateTitle[3].value + 'px ' + fontFamily;
+                properties.certificateTitle.properties.fillStyle = crtCertificateTitle[4].value;
+                render();
+            });
+        }
+
+        // For Certificate Date
+        const crtCertificateDate = document.querySelectorAll('.crt-certificate-date');
+        for (let i = 0; i < crtCertificateDate.length; i++) {
+            crtCertificateDate[i].addEventListener('input', function() {
+                properties.certificateDate.text = crtCertificateDate[0].value;
+                properties.certificateDate.x = crtCertificateDate[1].value;
+                properties.certificateDate.y = crtCertificateDate[2].value;
+                properties.certificateDate.properties.font = crtCertificateDate[3].value + 'px ' + fontFamily;
+                properties.certificateDate.properties.fillStyle = crtCertificateDate[4].value;
+                render();
+            });
+        }
+
+        // For Certificate Student Name
+        const crtCertificateStudentName = document.querySelectorAll('.crt-certificate-student-name');
+        for (let i = 0; i < crtCertificateStudentName.length; i++) {
+            crtCertificateStudentName[i].addEventListener('input', function() {
+                properties.certificateStudentName.text = crtCertificateStudentName[0].value;
+                properties.certificateStudentName.x = crtCertificateStudentName[1].value;
+                properties.certificateStudentName.y = crtCertificateStudentName[2].value;
+                properties.certificateStudentName.properties.font = crtCertificateStudentName[3].value + 'px ' + fontFamily;
+                properties.certificateStudentName.properties.fillStyle = crtCertificateStudentName[4].value;
+                render();
+            });
+        }
+
+        // For Certificate Body
+        const crtCertificateBody = document.querySelectorAll('.crt-certificate-body');
+        for (let i = 0; i < crtCertificateBody.length; i++) {
+            crtCertificateBody[i].addEventListener('input', function() {
+                properties.certificateBody.text = crtCertificateBody[0].value;
+                properties.certificateBody.x = crtCertificateBody[1].value;
+                properties.certificateBody.y = crtCertificateBody[2].value;
+                properties.certificateBody.lineHeight = crtCertificateBody[3].value;
+                properties.certificateBody.properties.font = crtCertificateBody[4].value + 'px ' + fontFamily;
+                properties.certificateBody.properties.fillStyle = crtCertificateBody[5].value;
+                render();
+            });
+        }
+
+        // For Certificate Role 01
+        const crtCertificateRole0 = document.querySelectorAll('.crt-certificate-role-0');
+        for (let i = 0; i < crtCertificateRole0.length; i++) {
+            crtCertificateRole0[i].addEventListener('input', function() {
+                properties.certificateRoles[0].role.text = crtCertificateRole0[0].value;
+                properties.certificateRoles[0].role.x = crtCertificateRole0[1].value;
+                properties.certificateRoles[0].role.y = crtCertificateRole0[2].value;
+                properties.certificateRoles[0].role.properties.font = crtCertificateRole0[3].value + 'px ' + fontFamily;
+                properties.certificateRoles[0].role.properties.fillStyle = crtCertificateRole0[4].value;
+
+                properties.certificateRoles[0].signature.x = crtCertificateRole0[5].value;
+                properties.certificateRoles[0].signature.y = crtCertificateRole0[6].value;
+                properties.certificateRoles[0].signature.quality = crtCertificateRole0[7].value;
+                render();
+            });
+        }
+
+        // For Certificate Role 01 Signature Image
+        document.getElementById('crt-certificate-role-0-image').addEventListener('input', function(e) {
+            let reader = new FileReader();
+            reader.readAsDataURL(e.target.files[0]);
+            reader.addEventListener('load', function(e) {
+                properties.certificateRoles[0].signature.url = e.target.result;
+                certificate.setRoleImageUpdate(e.target.result, 0);
+                setTimeout(function() {
+                    render();
+                }, 500);
+            });
+        });
+
+        // For Certificate Role 02
+        const crtCertificateRole1 = document.querySelectorAll('.crt-certificate-role-1');
+        for (let i = 0; i < crtCertificateRole1.length; i++) {
+            crtCertificateRole1[i].addEventListener('input', function() {
+                properties.certificateRoles[1].role.text = crtCertificateRole1[0].value;
+                properties.certificateRoles[1].role.x = crtCertificateRole1[1].value;
+                properties.certificateRoles[1].role.y = crtCertificateRole1[2].value;
+                properties.certificateRoles[1].role.properties.font = crtCertificateRole1[3].value + 'px ' + fontFamily;
+                properties.certificateRoles[1].role.properties.fillStyle = crtCertificateRole1[4].value;
+
+                properties.certificateRoles[1].signature.x = crtCertificateRole1[5].value;
+                properties.certificateRoles[1].signature.y = crtCertificateRole1[6].value;
+                properties.certificateRoles[1].signature.quality = crtCertificateRole1[7].value;
+                render();
+            });
+        }
+
+        // For Certificate Role 02 Signature Image
+        document.getElementById('crt-certificate-role-1-image').addEventListener('input', function(e) {
+            let reader = new FileReader();
+            reader.readAsDataURL(e.target.files[0]);
+            reader.addEventListener('load', function(e) {
+                properties.certificateRoles[1].signature.url = e.target.result;
+                certificate.setRoleImageUpdate(e.target.result, 1);
+                setTimeout(function() {
+                    render();
+                }, 500);
+            });
+        });
+
+        // For Certificate Download
+        document.getElementById('certificate-download-button').addEventListener('click', function() {
+            let link = document.createElement('a');
+            link.download = 'Certificate.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        window.onload = () => {
+            assignElementsValue(crtCertificateNumber, properties.certificateNumber);
+            assignElementsValue(crtCertificateTitle, properties.certificateTitle);
+            assignElementsValue(crtCertificateDate, properties.certificateDate);
+            assignElementsValue(crtCertificateStudentName, properties.certificateStudentName);
+            assignElementsValue(crtCertificateBody, properties.certificateBody, true);
+            assignElementsValue(crtCertificateRole0, properties.certificateRoles[0].role);
+            assignElementsValue(crtCertificateRole1, properties.certificateRoles[1].role);
+
+            crtCertificateRole0[5].value = properties.certificateRoles[0].signature.x;
+            crtCertificateRole0[6].value = properties.certificateRoles[0].signature.y;
+            crtCertificateRole0[7].value = properties.certificateRoles[0].signature.quality;
+
+            crtCertificateRole1[5].value = properties.certificateRoles[1].signature.x;
+            crtCertificateRole1[6].value = properties.certificateRoles[1].signature.y;
+            crtCertificateRole1[7].value = properties.certificateRoles[1].signature.quality;
+
+            render();
+            resolution();
+        }
+    </script>
+</body>
+</html>
