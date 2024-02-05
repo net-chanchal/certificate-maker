@@ -6,6 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Certificate Maker</title>
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
@@ -65,6 +66,10 @@
         .crt-control-heading p {
             font-size: 12px;
             color: #b2b2b2;
+        }
+
+        .crt-control-heading a {
+            color: #5aa7c6;
         }
 
         .crt-control-group button {
@@ -148,7 +153,7 @@
 
         <div class="crt-control-heading">
             <h3>Certificate Maker</h3>
-            <p>Powered by <i>chanchal.net</i></p>
+            <p>Powered by <i><a href="https://chanchal.net" target="_blank">chanchal.net</a></i></p>
         </div>
 
         <div class="crt-control-body">
@@ -570,7 +575,7 @@
         certificate.setRoleImage(properties.certificateRoles[0].signature.url);
         certificate.setRoleImage(properties.certificateRoles[1].signature.url);
 
-        const render = () => {
+        const render = (timer = null) => {
             certificate.clearContext();
             certificate.setCoverImageProperties(properties.certificateX, properties.certificateY, properties.certificateImageQuality);
             certificate.setZoom(properties.zoom);
@@ -584,6 +589,10 @@
             certificate.setRoleImageProperties(properties.certificateRoles[0].signature, 0);
             certificate.setRoleImageProperties(properties.certificateRoles[1].signature, 1);
             certificate.setRole(properties.certificateRoles);
+
+            if (timer !== null) {
+                clearTimeout(timer);
+            }
         }
 
         // For Certificate Action Properties Value Assign
@@ -591,6 +600,7 @@
             elements[0].value = properties.text;
             elements[1].value = properties.x;
             elements[2].value = properties.y;
+
 
             if (isCertificateBodyElement === false) {
                 elements[3].value = properties.properties.font.replace('px ' + fontFamily, '');
@@ -627,8 +637,8 @@
             reader.readAsDataURL(e.target.files[0]);
             reader.addEventListener('load', function(e) {
                 certificate.setCoverImage(e.target.result);
-                setTimeout(function() {
-                    render();
+                let timer = setTimeout(function() {
+                    render(timer);
                 }, 500);
             });
         });
@@ -723,8 +733,8 @@
             reader.addEventListener('load', function(e) {
                 properties.certificateRoles[0].signature.url = e.target.result;
                 certificate.setRoleImageUpdate(e.target.result, 0);
-                setTimeout(function() {
-                    render();
+                let timer = setTimeout(function() {
+                    render(timer);
                 }, 500);
             });
         });
@@ -753,8 +763,8 @@
             reader.addEventListener('load', function(e) {
                 properties.certificateRoles[1].signature.url = e.target.result;
                 certificate.setRoleImageUpdate(e.target.result, 1);
-                setTimeout(function() {
-                    render();
+                let timer = setTimeout(function() {
+                    render(timer);
                 }, 500);
             });
         });
@@ -762,7 +772,7 @@
         // For Certificate Download
         document.getElementById('certificate-download-button').addEventListener('click', function() {
             let link = document.createElement('a');
-            link.download = 'Certificate.png';
+            link.download = 'certificate-' + properties.certificateNumber.text + '.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         });

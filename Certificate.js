@@ -1,22 +1,21 @@
 /**
+ * AcademicCertificate Class
  *
  * @version     1.0
- * @sourcecode  https://github.com/cncldeveloper/certificate-maker
+ * @link        https://github.com/cncldeveloper/certificate-maker
  * @author      Md. Chanchal Biswas
- * @copyright   Copyright (c) 2022. (https://chanchal.net)
- * @licence     MIT License
- * @since       Version 1.0
+ * @copyright   2022
+ * @license     MIT License
+ * @since       1.0
  *
+ * This class is designed for generating academic certificates.
+ * It is tailored for a specific certificate format and includes
+ * methods and properties necessary for certificate generation.
  *
- * This class design for academic certificate generate.
- *
- * It is designed for a specific certificate and has
- * certain methods and properties required for that.
- *
- * All properties used in methods here create an object
- * and are shown in the example certificate.
- *
+ * The properties used in the methods below represent the fields
+ * visible on the example certificate.
  */
+
 class Certificate {
     #canvas;
     #context;
@@ -72,7 +71,7 @@ class Certificate {
      * @returns {{width: number, height: number}}
      */
     getRectRatio(originalWidth, originalHeight, quality) {
-        quality = (quality >= 1 && quality <= 100)? originalHeight / Math.abs(quality - 6): originalHeight;
+        quality = (quality >= 1 && quality <= 100) ? originalHeight / Math.abs(quality - 6) : originalHeight;
 
         let ratio = originalWidth / originalHeight;
         let newWidth = quality * ratio;
@@ -96,12 +95,14 @@ class Certificate {
      * @returns {{x: number, y: number}}
      */
     getRelativePosition(x, y) {
-        x = (x >= -5 && x <= 5)? x: 0.1;
-        y = (y >= -5 && y <= 5)? y: 0.1;
+        const maxRange = 5;
+
+        x = (x >= -maxRange && x <= maxRange) ? x : 0;
+        y = (y >= -maxRange && y <= maxRange) ? y : 0;
 
         return {
-            x: (this.#canvas.width / 5) * x,
-            y: (this.#canvas.height / 5) * y,
+            x: (this.#canvas.width / maxRange) * x,
+            y: (this.#canvas.height / maxRange) * y,
         };
     }
 
@@ -153,19 +154,22 @@ class Certificate {
      * @param properties
      */
     setText(properties) {
-        let i = 0;
-        let position = this.getRelativePosition(properties.x, properties.y);
+        const position = this.getRelativePosition(properties.x, properties.y);
 
-        Object.keys(properties).forEach(key => {
-            if (key === 'properties') {
-                Object.keys(Object.values(properties)[i]).forEach(property => {
-                    this.#context[property] = Object.values(properties)[i][property];
-                });
-            }
-            i++;
-        })
+        // Set context properties
+        if (properties.properties) {
+            const {properties: contextProperties} = properties;
+            Object.keys(contextProperties).forEach(property => {
+                this.#context[property] = contextProperties[property];
+            });
+        }
 
-        this.#context.fillText(properties.text, (this.#canvas.width - (-position.x)) / 2, position.y);
+        // Set text
+        this.#context.fillText(
+            properties.text,
+            (this.#canvas.width - (-position.x)) / 2,
+            position.y
+        );
     }
 
     /**
@@ -175,27 +179,26 @@ class Certificate {
      * @param properties
      */
     setTextParagraph(properties) {
-        let position = this.getRelativePosition(properties.x, properties.y);
+        const position = this.getRelativePosition(properties.x, properties.y);
         let tempLineHeight = 0;
-        let lines;
-        let i = 0;
 
-        Object.keys(properties).forEach(key => {
-            if (key === 'properties') {
-                Object.keys(Object.values(properties)[i]).forEach(property => {
-                    this.#context[property] = Object.values(properties)[i][property];
-                });
-            }
-            i++;
-        })
+        // Set context properties
+        if (properties.properties) {
+            const {properties: contextProperties} = properties;
+            Object.keys(contextProperties).forEach(property => {
+                this.#context[property] = contextProperties[property];
+            });
+        }
 
-        lines = properties.text.match(/[^\r\n]+/g);
-        lines = (lines === null)? 0: lines;
+        // Split text into lines
+        const lines = properties.text ? properties.text.match(/[^\r\n]+/g) : [];
 
-        for (i = 0; i < lines.length; i++) {
-            properties.x = (this.#canvas.width - (-position.x)) / 2;
+        // Render each line as a paragraph
+        for (let i = 0; i < lines.length; i++) {
+            properties.x = (this.#canvas.width + position.x) / 2;
+
             this.#context.fillText(lines[i], properties.x, position.y + tempLineHeight);
-            tempLineHeight = tempLineHeight + 35 + parseInt(properties.lineHeight);
+            tempLineHeight += 35 + parseInt(properties.lineHeight || 0);
         }
     }
 
@@ -237,7 +240,7 @@ class Certificate {
 
     /**
      * This method helps to display a text inside the
-     * canvas and change it's position and some design.
+     * canvas and change its position and some design.
      *
      * Here are various properties as method parameters.
      *
